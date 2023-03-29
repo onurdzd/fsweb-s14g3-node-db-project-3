@@ -3,7 +3,7 @@ const yup = require("yup");
 
 const stepSchema = yup.object().shape({
   instructions: yup.string("Hatalı step").required("Hatalı step"),
-  step_number: yup.number("Hatalı step").min(1, "Hatalı step").required("Hatalı step"),
+  step_number: yup.number("Hatalı step").min(1, "Hatalı step")
 });
 
 /*
@@ -18,7 +18,7 @@ const checkSchemeId = async (req, res, next) => {
   try {
     let { scheme_id } = req.params;
     let scheme = await SchemeModel.findById(scheme_id);
-    if (scheme[0] === undefined) {
+    if (scheme === null) {
       res.status(404).json({
         message: `scheme_id ${scheme_id} id li şema bulunamadı`,
       });
@@ -40,16 +40,11 @@ const checkSchemeId = async (req, res, next) => {
 */
 const validateScheme = async (req, res, next) => {
   try {
-    let schemes = await SchemeModel.find();
-    let isValidSchemeName = schemes.some(
-      (scheme) => scheme["scheme_name"] === req.body["scheme_name"]
-    );
-    if (!isValidSchemeName) {
+    const {scheme_name} = req.body;
+    if(typeof(scheme_name)!=="string" || !scheme_name){
+      res.status(400).json({message:"Geçersiz scheme_name"});
+    }else{
       next();
-    } else {
-      res.status(400).json({
-        message: "Geçersiz scheme_name",
-      });
     }
   } catch (error) {}
 };
